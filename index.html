@@ -164,6 +164,7 @@ section{padding:104px 0 0}
 .cell{border-radius:var(--r);padding:26px;position:relative;overflow:hidden;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:10px}
 .cell h3{font-size:22px;line-height:1.2}
 .cell p{color:var(--ink-2);font-size:15px;max-width:46ch}
+.cell .demo{font-weight:600;font-size:11.5px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.22);margin-left:4px}
 .cell .tag{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--p-ink)}
 .c-money{grid-column:span 4;background:var(--sky);border:0}
 .c-send{grid-column:span 2;grid-row:span 2;background:var(--grad-deep);border:0;color:#fff}
@@ -303,7 +304,7 @@ footer .prod i{width:24px;height:24px;font-size:13px;border-radius:7px}
 <div class="made"><div class="wrap">
   <p class="who">Sukūrė <b>ExoClass komanda</b>. Exopus dirba su tuo, ką jau naudojate.</p>
   <div class="prods" id="prods"></div>
-  <div class="nums"><div><b>20 000+</b><span>vaikų ExoClass sistemoje</span></div><div><b>700+</b><span>užsiėmimų vietų</span></div></div>
+  <div class="nums"><div><b>20 000+</b><span>vaikų ExoClass sistemoje</span></div><div><b>700+</b><span>užsiėmimų vietų</span></div><div><b>1 ar 100</b><span>trenerių: tinka ir vienam, ir tinklui</span></div></div>
 </div></div>
 
 <section id="bandyti"><div class="wrap try">
@@ -334,7 +335,7 @@ footer .prod i{width:24px;height:24px;font-size:13px;border-radius:7px}
       <div class="money-rows"><div><b>119/128</b><span>apmokėta</span></div><div><b>9</b><span>priminimai paruošti</span></div><div><b>2</b><span>sąskaitos pataisytos</span></div></div>
     </div>
     <div class="cell c-send reveal">
-      <span class="tag"><i class="ph ph-paper-plane-tilt"></i>ExoSend</span>
+      <span class="tag"><i class="ph ph-paper-plane-tilt"></i>ExoSend <span class="demo">pavyzdys</span></span>
       <h3>Laiškai ir SMS tėvams per minutę.</h3>
       <p>Registracijos patvirtinimai, priminimai apie užsiėmimus ir sąskaitas. Exopus parašo, jūs patvirtinate.</p>
       <div class="sms" id="sms">
@@ -344,7 +345,7 @@ footer .prod i{width:24px;height:24px;font-size:13px;border-radius:7px}
       </div>
     </div>
     <div class="cell c-sign reveal">
-      <span class="tag"><i class="ph ph-signature"></i>ExoSign</span>
+      <span class="tag"><i class="ph ph-signature"></i>ExoSign <span class="demo">pavyzdys</span></span>
       <h3>Tėvai pasirašo sutartį pirštu telefone.</h3>
       <div class="sig"><div class="count"><span id="sigN">7</span><small> iš 11 pasirašė</small></div><button class="btn" id="sigGo">Priminti</button></div>
     </div>
@@ -357,7 +358,7 @@ footer .prod i{width:24px;height:24px;font-size:13px;border-radius:7px}
 </div></section>
 
 <section id="veiklos"><div class="wrap">
-  <div class="sec-h reveal"><h2>Vienas Exopus. Kiekvienam būreliui.</h2><p>Veiklos, kurias veda ExoClass partneriai ir teikėjai, su kuriais kalbamės. Paspauskite ir pažiūrėkite, kaip Exopus persirengia.</p></div>
+  <div class="sec-h reveal"><h2>Vienas Exopus. Kiekvienam būreliui.</h2><p>Veiklos, kurias veda ExoClass partneriai ir teikėjai, su kuriais kalbamės (abėcėlės tvarka). Paspauskite ir pažiūrėkite, kaip Exopus persirengia.</p></div>
   <div class="act-grid reveal" id="actGrid"></div>
 </div></section>
 
@@ -392,7 +393,7 @@ footer .prod i{width:24px;height:24px;font-size:13px;border-radius:7px}
   <div class="reveal">
     <details><summary>Ar Exopus jau veikia?</summary><p>ExoClass, ExoSend ir ExoSign veikia šiandien. Exopus yra DI pagalbininkas, kurį kuriame ant jų: pirmas prototipas jau sukuria grupę iš vieno sakinio. Šiame puslapyje matote kryptį.</p></details>
     <details><summary>Ar jis ką nors išsiųs be manęs?</summary><p>Ne. Viskas, kas susiję su pinigais, tėvais ar sutartimis, laukia jūsų patvirtinimo.</p></details>
-    <details><summary>Kaip su vaikų ir tėvų duomenimis?</summary><p>Taip kuriame Exopus: jis dirba jūsų ExoClass paskyroje su tomis pačiomis teisėmis kaip jūs, mato tik tai, ko reikia užduočiai, o kiekvienas jo veiksmas lieka žurnale. Viskas, kas išeina tėvams, pirma pereina per jūsų patvirtinimą.</p></details>
+    <details><summary>Kaip su vaikų ir tėvų duomenimis?</summary><p>Exopus kuriamas pagal tris principus: jis dirba jūsų ExoClass paskyroje su tomis pačiomis teisėmis kaip jūs, kiekvienas jo veiksmas lieka žurnale, o viskas, kas išeina tėvams, pirma pereina per jūsų patvirtinimą. Prieš startą viešai paskelbsime, kaip tvarkomi duomenys pagal BDAR.</p></details>
     <details><summary>Kokiems būreliams tinka?</summary><p>Futbolui, robotikai, kovos menams, šokiams, programavimui, kalboms, dailei, muzikai, gimnastikai ir kitiems. Jei turite grupes, vaikus ir tėvus, Exopus turi darbo.</p></details>
     <details><summary>Kiek tai kainuoja?</summary><p>ExoClass kainos skelbiamos viešai <a href="https://exoclass.lt/kainodara/" target="_blank" rel="noopener">exoclass.lt/kainodara</a>. Exopuso kainą paskelbsime prieš startą. Pokalbyje pasakysime, kiek laiko jis sutaupytų būtent jūsų būreliui.</p></details>
   </div>
@@ -431,22 +432,22 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const root=document.documentElement;
 
 const CHARS=[['pixar','Pixar',285],['plush','Pliušinis',315],['glass','Stiklinis',270],['vinyl','Vinilinis',315],['linas','Lino Exopus',8]];
-/* ordered by how many ExoClass partners and prospects run each activity (wiki/markets/exoclass-prospektai-2026-09.md, partneriai-benchmark.md, 2026-09-25 count) */
+/* alphabetical after the default, so no activity (ExoClass owns a robotics school) gets pride of place */
 const ACTS=[
  ['exo','ExoClass','ph-sparkle','Numatytasis'],
- ['football','Futbolas','ph-soccer-ball','Futbolo akademijos'],
- ['robotics','Robotika','ph-robot','Robotikos būreliai'],
- ['martial','Kovos menai','ph-hand-fist','Karatė, dziudo, imtynės'],
- ['dance','Šokiai','ph-person-simple-tai-chi','Šokių studijos'],
- ['coding','Programavimas','ph-code','Programavimo mokyklos'],
- ['languages','Kalbos','ph-translate','Kalbų mokyklos'],
  ['art','Dailė','ph-palette','Dailės studijos'],
- ['basketball','Krepšinis','ph-basketball','Krepšinio akademijos'],
- ['music','Muzika','ph-music-notes','Muzikos mokyklos'],
+ ['football','Futbolas','ph-soccer-ball','Futbolo akademijos'],
  ['gymnastics','Gimnastika','ph-person-arms-spread','Gimnastikos mokyklos'],
+ ['languages','Kalbos','ph-translate','Kalbų mokyklos'],
+ ['martial','Kovos menai','ph-hand-fist','Karatė, dziudo, imtynės'],
+ ['basketball','Krepšinis','ph-basketball','Krepšinio akademijos'],
  ['detective','Kritinis mąstymas','ph-magnifying-glass','Detektyvų klubai'],
+ ['science','Mokslai','ph-flask','Gamtos mokslai'],
+ ['music','Muzika','ph-music-notes','Muzikos mokyklos'],
+ ['coding','Programavimas','ph-code','Programavimo mokyklos'],
+ ['robotics','Robotika','ph-robot','Robotikos būreliai'],
  ['chess','Šachmatai','ph-crown-simple','Šachmatų mokyklos'],
- ['science','Mokslai','ph-flask','Gamtos mokslai']
+ ['dance','Šokiai','ph-person-simple-tai-chi','Šokių studijos']
 ];
 let S={s:'pixar',a:'exo',t:'light'};
 let auto=true;
@@ -475,8 +476,8 @@ function pickAct(k,fromUser){S.a=k;if(fromUser){auto=false;updAutoBtn()}markAct(
   if(q.get('a')&&q.get('a')!=='exo')auto=false;
   if(q.get('studio')==='0')$('#fab').style.display='none';
 })();
-/* hero pills: the 8 most common, all 13 live in the grid and the studio */
-$('#acts').innerHTML=ACTS.slice(0,9).map(a=>`<button class="act" data-a="${a[0]}"><i class="ph ${a[2]}"></i>${esc(a[1])}</button>`).join('');
+/* hero pills: all activities */
+$('#acts').innerHTML=ACTS.map(a=>`<button class="act" data-a="${a[0]}"><i class="ph ${a[2]}"></i>${esc(a[1])}</button>`).join('');
 $('#sacts').innerHTML=ACTS.map(a=>`<button data-a="${a[0]}">${esc(a[1])}</button>`).join('');
 $('#actGrid').innerHTML=ACTS.slice(1).map(a=>`<button class="act-tile" data-a="${a[0]}"><i class="ph ${a[2]}"></i><span><b>${esc(a[1])}</b><small>${esc(a[3])}</small></span></button>`).join('');
 $('#chars').innerHTML=CHARS.map(c=>`<button data-s="${c[0]}" title="${esc(c[1])}"><img src="img/styles/${c[0]}-av.webp" alt="${esc(c[1])}"></button>`).join('');
