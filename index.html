@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exopus · ExoClass</title>
+<meta name="description" content="Nepirk dar vienos sistemos. Pasamdyk Exopus: ExoClass DI pagalbininką būrelių teikėjams.">
+<meta property="og:title" content="Exopus · ExoClass pagalbininkas DI erai">
+<meta property="og:description" content="Aštuonios rankos administracijai, grupėms, mokėjimams ir tėvams. Tu grįžti prie vaikų.">
+<meta property="og:image" content="img/styles/pixar.webp">
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:#AE4197; --p-dark:color-mix(in srgb,var(--p) 72%,#000); --p-soft:color-mix(in srgb,var(--p) 12%,#fff);
+  --icy:#DCEBFF; --icy-ink:#23406B;
+  --ground:#FBF7FD; --card:#FFFFFF; --surface:#F3E9F7; --ink:#1D1224; --muted:#665B70; --line:#EBDDF1;
+  --ok:#2E9E6B; --ok-bg:#EAF7F0; --band:#1D1224; --band-ink:#fff; --band-muted:#C9BDD2;
+  --shadow:0 20px 60px -20px color-mix(in srgb,var(--p) 45%,transparent);
+  --hue:0deg; --r:28px;
+  --display:'Nunito',system-ui,sans-serif; --body:'Inter',system-ui,-apple-system,sans-serif;
+}
+:root[data-theme="dark"]{
+  --p-soft:color-mix(in srgb,var(--p) 18%,#1F1724);
+  --ground:#140F17; --card:#241B2A; --surface:#1F1724; --ink:#F4ECF6; --muted:#B9A7C0; --line:#3A2D42;
+  --icy:#1E2E47; --icy-ink:#CFE2FF; --ok:#6FCF97; --ok-bg:#16301F; --band:#2A1F31;
+  --shadow:0 20px 60px -20px rgba(0,0,0,.65);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:17px/1.55 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .5s,color .5s}
+a{color:inherit}
+button{font:inherit;cursor:pointer;color:inherit}
+h1,h2,h3{font-family:var(--display);line-height:1.06;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+.kicker{display:inline-block;font-weight:800;font-size:13px;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:14px 24px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .15s,background .5s}
+.btn.pri{background:var(--p);color:#fff;box-shadow:0 12px 26px -12px var(--p)}
+.btn.pri:hover{transform:translateY(-2px)}
+.btn.ghost{background:var(--card);border:1px solid var(--line)}
+.char{filter:hue-rotate(var(--hue));transition:filter .7s}
+
+.aurora{position:fixed;inset:-20%;z-index:-1;pointer-events:none;opacity:.55;
+  background:radial-gradient(38% 32% at 18% 18%,color-mix(in srgb,var(--p) 35%,transparent),transparent 70%),
+             radial-gradient(34% 30% at 82% 22%,rgba(122,92,255,.2),transparent 70%),
+             radial-gradient(40% 34% at 60% 88%,rgba(63,162,247,.16),transparent 70%);
+  animation:drift 24s ease-in-out infinite alternate}
+
+.ribbon{background:var(--band);color:var(--band-ink);font-size:13px;text-align:center;padding:8px 16px}
+.ribbon b{color:color-mix(in srgb,var(--p) 55%,#fff)}
+
+nav.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--ground) 84%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:66px;gap:14px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:900 21px var(--display)}
+.logo .dot{width:12px;height:12px;border-radius:50%;background:var(--p)}
+.logo small{font:600 13px var(--body);color:var(--muted)}
+.links{display:flex;gap:26px;font-weight:600;font-size:15px;color:var(--muted)}
+.links a{text-decoration:none}
+@media(max-width:860px){.links{display:none}}
+@media(max-width:520px){nav.top .btn{padding:10px 16px;font-size:14px}.logo small{display:none}}
+
+/* HERO */
+.hero{padding:54px 0 16px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:36px;align-items:center}
+@media(max-width:920px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--icy);color:var(--icy-ink);font-weight:700;font-size:13px;padding:7px 14px;border-radius:999px;margin-bottom:18px}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:ping 2s infinite}
+h1{font-weight:900;font-size:clamp(40px,6.3vw,78px);letter-spacing:-.022em;margin-bottom:18px}
+.grad{background:linear-gradient(90deg,var(--p),#7A5CFF,#3FA2F7,var(--p));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 9s linear infinite}
+.lead{font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:540px;margin-bottom:26px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.proof{display:flex;gap:26px;flex-wrap:wrap;margin-top:28px}
+.proof b{display:block;font:900 28px var(--display)}
+.proof span{font-size:14px;color:var(--muted)}
+
+.world{position:relative;aspect-ratio:1/1;max-width:560px;width:100%;margin:0 auto}
+.bubble{position:absolute;inset:4%;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 35% 28%,#fff 0%,color-mix(in srgb,var(--p) 14%,#fff) 34%,color-mix(in srgb,var(--p) 30%,#fff) 66%,color-mix(in srgb,var(--p) 45%,#fff) 100%);
+  box-shadow:inset 0 -30px 60px color-mix(in srgb,var(--p) 30%,transparent),inset 0 20px 50px rgba(255,255,255,.8),var(--shadow);
+  animation:breathe 6s ease-in-out infinite;transition:background .6s}
+.bubble::after{content:"";position:absolute;left:14%;top:9%;width:28%;height:15%;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(7px);transform:rotate(-24deg)}
+.floor{position:absolute;left:-5%;right:-5%;bottom:-6%;height:32%;border-radius:50% 50% 0 0;background:color-mix(in srgb,var(--p) 22%,#fff)}
+.coral{position:absolute;bottom:16%;width:12%;height:22%}
+.coral.a{left:10%}.coral.b{right:9%;height:16%;width:10%}
+.coral span{position:absolute;bottom:0;width:26%;border-radius:999px;background:color-mix(in srgb,var(--p) 55%,#fff)}
+.coral span:nth-child(1){left:37%;height:100%}
+.coral span:nth-child(2){left:5%;height:62%;transform:rotate(-18deg);transform-origin:bottom}
+.coral span:nth-child(3){right:5%;height:72%;transform:rotate(16deg);transform-origin:bottom;background:#9FC3FF}
+.rise{position:absolute;bottom:-20px;border-radius:50%;border:2px solid rgba(255,255,255,.85);background:rgba(255,255,255,.25);animation:rise linear infinite}
+.hero-char{position:absolute;left:50%;top:47%;width:60%;transform:translate(-50%,-50%);z-index:3;animation:float 5s ease-in-out infinite}
+.hero-char img{width:100%;display:block;filter:hue-rotate(var(--hue)) drop-shadow(0 22px 22px rgba(60,20,70,.28));transition:filter .7s,opacity .3s}
+.world.busy .hero-char{animation:float 5s ease-in-out infinite,wiggle .5s ease-in-out infinite}
+.orbit{position:absolute;inset:0;z-index:4;pointer-events:none}
+.thing{position:absolute;left:50%;top:47%;width:50px;height:50px;margin:-25px;display:grid;place-items:center;font-size:25px;background:var(--card);border-radius:16px;box-shadow:0 10px 20px -8px rgba(60,20,70,.4);animation:orbit 16s linear infinite}
+.world.busy .thing{animation-duration:4s}
+.thing:nth-child(2){animation-delay:-4s}.thing:nth-child(3){animation-delay:-8s}.thing:nth-child(4){animation-delay:-12s}
+.world.busy .thing:nth-child(2){animation-delay:-1s}.world.busy .thing:nth-child(3){animation-delay:-2s}.world.busy .thing:nth-child(4){animation-delay:-3s}
+.status{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px 8px 8px;box-shadow:var(--shadow);max-width:96%;white-space:nowrap}
+.status img{width:30px;height:30px;border-radius:50%;background:var(--surface);object-fit:contain}
+.status span{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.caret{display:inline-block;width:2px;height:15px;background:var(--p);animation:blink 1s steps(1) infinite}
+.fcard{position:absolute;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 13px;font-size:13px;font-weight:600;box-shadow:var(--shadow);animation:bob 5s ease-in-out infinite}
+.fcard b{color:var(--ok)}
+.fcard.a{left:-3%;top:16%}.fcard.b{right:-4%;top:42%;animation-delay:-2.5s}
+@media(max-width:560px){.fcard{display:none}}
+
+:root[data-theme="dark"] .bubble{background:radial-gradient(circle at 35% 28%,color-mix(in srgb,var(--p) 55%,#3a2d42) 0%,color-mix(in srgb,var(--p) 30%,#211827) 55%,#17111b 100%);box-shadow:inset 0 20px 50px rgba(255,255,255,.08),var(--shadow)}
+:root[data-theme="dark"] .floor{background:color-mix(in srgb,var(--p) 25%,#211827)}
+:root[data-theme="dark"] .minibub{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--p) 45%,#3a2d42),#211827 70%)}
+/* ticker */
+.ticker{margin-top:26px;border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;background:var(--card)}
+.ticker div{display:inline-block;padding:12px 0;animation:marquee 40s linear infinite}
+.ticker span{margin:0 26px;font-weight:600;font-size:14px;color:var(--muted)}
+.ticker span b{color:var(--ink)}
+
+/* console */
+.console{margin:30px auto 0;max-width:860px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.ask{display:flex;gap:10px;padding:14px;align-items:center;border-bottom:1px solid var(--line)}
+.ask img{width:42px;height:42px;border-radius:50%;background:var(--surface);object-fit:contain;flex:none}
+.ask input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:17px;padding:10px 4px;background:none;color:var(--ink)}
+.ask .go{width:46px;height:46px;border-radius:50%;border:0;background:var(--p);color:#fff;font-size:20px;flex:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px}
+.chip{border:1px solid var(--line);background:var(--ground);border-radius:999px;padding:8px 13px;font-size:14px;font-weight:600}
+.chip:hover{border-color:var(--p)}
+.chip:disabled{opacity:.45;cursor:default}
+.feed{max-height:0;overflow:hidden;transition:max-height .5s}
+.feed.open{max-height:1200px;border-top:1px solid var(--line)}
+.feed-in{padding:16px 18px 20px}
+.feed-h{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:15px;animation:in .35s ease-out}
+.log time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px;min-width:40px;padding-top:2px}
+.approve{margin-top:12px;background:linear-gradient(135deg,var(--p-soft),var(--icy));border:1px solid var(--line);border-radius:16px;padding:16px;animation:in .35s ease-out}
+.approve p{margin-bottom:12px;font-weight:600}
+.approve small{display:block;color:var(--muted);font-weight:500;margin-top:4px}
+.approve .row{display:flex;gap:10px;flex-wrap:wrap}
+.approve .btn{padding:10px 18px}
+.done{margin-top:12px;background:var(--ok-bg);border-radius:16px;padding:14px 16px;font-weight:600;animation:in .35s ease-out}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* sections */
+section{padding:92px 0 0}
+.sec-h{max-width:760px;margin:0 auto 38px;text-align:center}
+.sec-h h2{font-weight:900;font-size:clamp(31px,4.6vw,52px);letter-spacing:-.016em;margin-bottom:12px}
+.sec-h p{color:var(--muted);font-size:18px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* hire, not buy */
+.vs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media(max-width:820px){.vs{grid-template-columns:minmax(0,1fr)}}
+.vs > div{border-radius:26px;padding:28px}
+.old{background:var(--card);border:1px dashed var(--line);color:var(--muted)}
+.new{background:var(--p);color:#fff;box-shadow:var(--shadow)}
+.vs h3{font-size:24px;font-weight:900;margin-bottom:14px}
+.vs ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.vs li{display:flex;gap:10px}
+.old li::before{content:"✕";color:#C0392B;font-weight:800}
+.new li::before{content:"✓";font-weight:800}
+
+/* CV */
+.cv{display:grid;grid-template-columns:320px minmax(0,1fr);gap:0;background:var(--card);border:1px solid var(--line);border-radius:32px;overflow:hidden;box-shadow:var(--shadow)}
+@media(max-width:820px){.cv{grid-template-columns:minmax(0,1fr)}}
+.cv-side{background:var(--p-soft);padding:30px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.cv-side img{width:190px;animation:float 5s ease-in-out infinite}
+.cv-side h3{font-size:30px;font-weight:900}
+.cv-side .role{font-weight:700;color:var(--p)}
+.cv-side .badge{background:var(--card);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
+.cv-main{padding:30px}
+.cv-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 26px;margin-bottom:24px}
+@media(max-width:560px){.cv-rows{grid-template-columns:minmax(0,1fr)}}
+.cv-rows div{border-bottom:1px solid var(--line);padding-bottom:10px}
+.cv-rows small{display:block;color:var(--muted);font-size:13px}
+.cv-rows b{font-size:16px}
+.skills{display:flex;flex-wrap:wrap;gap:8px}
+.skills span{background:var(--surface);border-radius:999px;padding:7px 13px;font-size:14px;font-weight:600}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media(max-width:820px){.steps{grid-template-columns:minmax(0,1fr)}}
+.step{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px;position:relative}
+.step .n{width:42px;height:42px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;font:900 19px var(--display);margin-bottom:14px}
+.step h3{font-size:21px;font-weight:800;margin-bottom:6px}
+.step p{color:var(--muted);font-size:15px}
+.bubble-msg{margin-top:14px;background:var(--surface);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:14px;font-weight:600}
+
+/* grid of jobs */
+.jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.job{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;gap:14px;transition:transform .2s,box-shadow .2s}
+.job:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.job .e{font-size:26px;width:48px;height:48px;border-radius:14px;background:var(--p-soft);display:grid;place-items:center;flex:none}
+.job h3{font-size:17px;font-weight:800;margin-bottom:3px}
+.job p{font-size:14px;color:var(--muted)}
+.job button{margin-top:8px;border:0;background:none;padding:0;color:var(--p);font-weight:700;font-size:13px}
+
+/* state line */
+.state-cpis{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
+@media(max-width:820px){.state-cpis{grid-template-columns:minmax(0,1fr)}}
+.state-cpis > div{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px}
+.state-cpis h3{font-size:20px;font-weight:800;margin-bottom:10px}
+.state-cpis ul{margin:0;padding-left:1.1em;color:var(--muted);display:grid;gap:6px}
+.state-cpis .us{border-color:var(--p);border-width:2px}
+
+/* band */
+.band{background:var(--band);color:var(--band-ink);border-radius:40px;padding:62px 0;margin:92px 16px 0}
+.band .sec-h p{color:var(--band-muted)}
+.band .kicker{color:color-mix(in srgb,var(--p) 55%,#fff)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.tcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:22px}
+.tcard h3{font-weight:800;margin:8px 0 6px;font-size:19px}
+.tcard p{color:var(--band-muted);font-size:15px}
+
+/* adapt */
+.adapt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+@media(max-width:860px){.adapt{grid-template-columns:minmax(0,1fr)}}
+.minibub{position:relative;aspect-ratio:1;max-width:400px;width:100%;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--p-soft) 55%,color-mix(in srgb,var(--p) 28%,#fff));box-shadow:var(--shadow)}
+.minibub img{position:absolute;left:50%;top:50%;width:64%;transform:translate(-50%,-50%);animation:float 5s ease-in-out infinite}
+.minibub .tag{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:14px;white-space:nowrap}
+.pal{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.pal button{display:flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px 7px 7px;font-weight:700;font-size:14px}
+.pal button i{width:22px;height:22px;border-radius:50%}
+.pal button.on{border-color:var(--ink)}
+
+/* faq */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 22px}
+.faq summary{font-weight:700;cursor:pointer;font-size:17px}
+.faq p{margin-top:10px;color:var(--muted)}
+
+.close{text-align:center;padding:96px 0 70px}
+.close img{width:180px;animation:float 5s ease-in-out infinite}
+.close h2{font-weight:900;font-size:clamp(34px,5.2vw,62px);margin:18px auto 14px;max-width:860px;letter-spacing:-.016em}
+.close p{color:var(--muted);font-size:19px;max-width:640px;margin:0 auto 26px}
+footer{border-top:1px solid var(--line);padding:26px 0 110px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* STYLE STUDIO */
+.studio-fab{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 18px 12px 12px;background:var(--ink);color:var(--ground);font-weight:800;box-shadow:0 14px 30px -10px rgba(0,0,0,.5)}
+.studio-fab img{width:30px;height:30px;border-radius:50%;background:var(--p-soft);object-fit:contain}
+.studio{position:fixed;right:18px;bottom:80px;z-index:90;width:min(380px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 70px -20px rgba(0,0,0,.45);padding:18px;transform-origin:bottom right;transition:transform .25s,opacity .25s}
+.studio[hidden]{display:block!important;opacity:0;transform:scale(.9) translateY(10px);pointer-events:none}
+.studio h4{margin:0 0 4px;font:900 19px var(--display)}
+.studio .sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.studio label.t{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 8px}
+.chars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.chars button{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:4px;aspect-ratio:1;display:grid;place-items:center}
+.chars button img{width:100%;height:100%;object-fit:contain}
+.chars button.on{border-color:var(--p);background:var(--p-soft)}
+.charname{font-size:13px;font-weight:700;margin-top:6px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 2px var(--line)}
+.swatches button.on{box-shadow:0 0 0 3px var(--ink)}
+.seg{display:flex;gap:6px;background:var(--surface);padding:4px;border-radius:14px}
+.seg button{flex:1;border:0;border-radius:10px;padding:8px;background:transparent;font-weight:700;font-size:14px}
+.seg button.on{background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.studio .row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.studio .row .btn{padding:10px 16px;font-size:14px;flex:1;justify-content:center}
+.copied{font-size:12px;color:var(--ok);min-height:1em;margin-top:6px}
+
+@keyframes drift{from{transform:translate(0,0) rotate(0)}to{transform:translate(4%,-3%) rotate(8deg)}}
+@keyframes shimmer{to{background-position:300% 0}}
+@keyframes breathe{50%{transform:scale(1.015)}}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -12px}}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+@keyframes wiggle{0%,100%{rotate:-1.5deg}50%{rotate:1.5deg}}
+@keyframes orbit{from{transform:rotate(0) translateX(345%) rotate(0)}to{transform:rotate(360deg) translateX(345%) rotate(-360deg)}}
+@keyframes rise{from{transform:translateY(0);opacity:0}10%{opacity:1}to{transform:translateY(-560px);opacity:0}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(46,158,107,.45)}70%{box-shadow:0 0 0 7px rgba(46,158,107,0)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="ribbon"><b>Koncepcija</b> · Exopus dar kuriamas. ExoClass sistema veikia šiandien, o šitas puslapis rodo, kur einame.</div>
+
+<nav class="top"><div class="wrap">
+  <a class="logo" href="#"><span class="dot"></span>ExoClass <small>+ Exopus</small></a>
+  <div class="links"><a href="#kaip">Kaip veikia</a><a href="#darbai">Ką moka</a><a href="#pasitikejimas">Saugumas</a><a href="#duk">DUK</a></div>
+  <a class="btn pri" href="#try">Duok užduotį</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow"><i></i>Būrelių pagalbininkas DI erai</div>
+      <h1>Nepirk dar vienos sistemos.<br><span class="grad">Pasamdyk Exopus.</span></h1>
+      <p class="lead">Exopus iš ExoClass tvarko registracijas, grupes, mokėjimus, sąskaitas ir tėvus. Tu parašai vieną sakinį, jis padaro, o prieš svarbų žingsnį paklausia tavęs. Tu grįžti prie vaikų.</p>
+      <div class="ctas"><a class="btn pri" href="#try">Išbandyk dabar ↓</a><a class="btn ghost" href="https://exoclass.lt" target="_blank" rel="noopener">Pasikalbam</a></div>
+      <div class="proof"><div><b>20 000+</b><span>vaikų ExoClass'e</span></div><div><b>700+</b><span>užsiėmimų vietų</span></div><div><b>8</b><span>rankos, 0 atostogų</span></div></div>
+    </div>
+    <div class="world" id="world">
+      <div class="bubble" id="bubble"><div class="floor"></div><div class="coral a"><span></span><span></span><span></span></div><div class="coral b"><span></span><span></span><span></span></div></div>
+      <div class="hero-char"><img class="c-main" src="img/styles/pixar.webp" alt="Exopus"></div>
+      <div class="orbit"><div class="thing">🧾</div><div class="thing">✉️</div><div class="thing">📅</div><div class="thing">💶</div></div>
+      <div class="fcard a">✅ Lankomumas <b>5/5 grupių</b></div>
+      <div class="fcard b">💶 Apmokėta <b>119/128</b></div>
+      <div class="status"><img class="c-av" src="img/styles/pixar-av.webp" alt=""><span id="statusText"></span><i class="caret"></i></div>
+    </div>
+  </div>
+</div>
+<div class="ticker"><div id="ticker"></div></div>
+<div class="wrap">
+  <div class="console" id="try">
+    <form class="ask" id="askForm"><img class="c-av" src="img/styles/pixar-av.webp" alt=""><input id="askInput" autocomplete="off" placeholder="Pvz.: sukurk grupę antradieniais 16:00…"><button class="go" aria-label="Siųsti">↑</button></form>
+    <div class="chips" id="chips"></div>
+    <div class="feed" id="feed"><div class="feed-in">
+      <div class="feed-h"><span>Ką Exopus daro</span><span id="feedTask"></span></div>
+      <ul class="log" id="log"></ul><div id="tail"></div>
+      <div class="note">Demo. Skaičiai ir vardai sugalvoti, tik parodyti, kaip tai jaustųsi.</div>
+    </div></div>
+  </div>
+</div></header>
+
+<section class="reveal"><div class="wrap">
+  <div class="sec-h"><span class="kicker">Naujas būdas</span><h2>Ne dar vienas įrankis. Naujas komandos narys.</h2><p>Sistemos duoda mygtukus. Exopus duoda rezultatą.</p></div>
+  <div class="vs">
+    <div class="old"><h3>Kaip buvo</h3><ul><li>Dešimt skirtukų, kad sukurtum vieną grupę</li><li>Vakarai prie Excel ir banko išrašų</li><li>Tėvų žinutės po 22:00</li><li>Pamiršti priminimai ir neapmokėtos sąskaitos</li><li>Mokymai, kaip naudotis sistema</li></ul></div>
+    <div class="new"><h3>Su Exopus</h3><ul><li>Vienas sakinys, ir grupė sukurta</li><li>Sąskaitos patikrintos, kol tu treniruoji</li><li>Tėvai gauna atsakymą, tu gauni ramybę</li><li>Priminimai išeina patys, bet tik tau patvirtinus</li><li>Jokių mokymų: tiesiog parašyk</li></ul></div>
+  </div>
+</div></section>
+
+<section class="reveal"><div class="wrap">
+  <div class="sec-h"><span class="kicker">Darbo pokalbis</span><h2>Susipažink su kandidatu.</h2></div>
+  <div class="cv">
+    <div class="cv-side"><img class="c-main" src="img/styles/pixar.webp" alt=""><h3>Exopus</h3><div class="role">Būrelio administratorius</div><span class="badge">Pasiruošęs pradėti šiandien</span></div>
+    <div class="cv-main">
+      <div class="cv-rows">
+        <div><small>Darbo laikas</small><b>24/7, be atostogų</b></div>
+        <div><small>Rankos</small><b>8, visos užimtos tavo darbais</b></div>
+        <div><small>Širdys</small><b>3, kaip ExoClass įkūrėjai</b></div>
+        <div><small>Kalbos</small><b>Lietuvių, anglų, tėvų</b></div>
+        <div><small>Mėgsta</small><b>Tai, ko tu nekenti</b></div>
+        <div><small>Nemėgsta</small><b>Kai vaikai laukia</b></div>
+      </div>
+      <div class="skills" id="skills"></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="kaip" class="reveal"><div class="wrap">
+  <div class="sec-h"><span class="kicker">Kaip veikia</span><h2>Parašai. Patvirtini. Grįžti prie vaikų.</h2></div>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h3>Parašai, ko reikia</h3><p>Kaip kolegai. Be meniu ir be mokymų.</p><div class="bubble-msg">„Sukurk grupę antradieniais 16:00 Antakalnio g. 12"</div></div>
+    <div class="step"><div class="n">2</div><h3>Exopus padaro</h3><p>Randa adresą, patikrina laiką, perima kainą iš panašių grupių. Viską matai gyvai.</p><div class="bubble-msg">✓ Rastos 3 panašios grupės · 12 vietų</div></div>
+    <div class="step"><div class="n">3</div><h3>Tu patvirtini</h3><p>Niekas neiškeliauja be tavęs. Vienas paspaudimas.</p><div class="bubble-msg">Grupė sukurta. Registracija tėvams atidaryta. ✅</div></div>
+  </div>
+</div></section>
+
+<section id="darbai"><div class="wrap">
+  <div class="sec-h reveal"><span class="kicker">Aštuonios rankos ir dar daugiau</span><h2>Viskas, ko nemėgsti. Exopus tai dievina.</h2><p>Skaitmeninius darbus atiduok skaitmeniniam aštuonkojui.</p></div>
+  <div class="jobs" id="jobs"></div>
+</div></section>
+
+<section class="reveal"><div class="wrap">
+  <div class="sec-h"><span class="kicker">Registracija valstybės sistemoje?</span><h2>Puiku. Exopus tvarko visa kita.</h2><p>Registracija yra tik pradžia. Būrelis gyvena iš to, kas vyksta po jos.</p></div>
+  <div class="state-cpis">
+    <div><h3>Registracija ir sutartis</h3><ul><li>Rasti būrelį</li><li>Užsiregistruoti</li><li>Pasirašyti sutartį</li></ul></div>
+    <div class="us"><h3>🐙 Exopus, kiekvieną savaitę</h3><ul><li>Mokėjimai, priminimai ir sąskaitos</li><li>Lankomumas ir praleidimai</li><li>Grupės, vietos ir laukiančiųjų sąrašas</li><li>SMS ir laiškai tėvams</li><li>Kas auga, kas byra ir kodėl</li></ul></div>
+  </div>
+</div></section>
+
+<div class="band reveal" id="pasitikejimas"><div class="wrap">
+  <div class="sec-h"><span class="kicker">Tu vairuoji</span><h2>Mielas. Bet ne vienas be tavęs.</h2><p>Geriausių DI agentų principai, pritaikyti būreliams.</p></div>
+  <div class="tgrid">
+    <div class="tcard">👀<h3>Rodo, ką daro</h3><p>Kiekvienas žingsnis matomas veiklos žurnale. Jokios juodos dėžės.</p></div>
+    <div class="tcard">✋<h3>Klausia prieš siunčiant</h3><p>Pinigai, žinutės tėvams ir sutartys iškeliauja tik tau patvirtinus.</p></div>
+    <div class="tcard">🔕<h3>Netrukdo be reikalo</h3><p>Praneša tik tada, kai tikrai svarbu.</p></div>
+    <div class="tcard">🧾<h3>Rimtas ant pinigų</h3><p>Sąskaitų ir kainų ekranai lieka paprasti ir aiškūs.</p></div>
+  </div>
+</div></div>
+
+<section class="reveal"><div class="wrap adapt">
+  <div class="minibub"><img class="c-main" src="img/styles/pixar.webp" alt=""><div class="tag" id="miniTag">Exopus · ExoClass</div></div>
+  <div>
+    <span class="kicker">Prisitaiko prie bet ko</span>
+    <h2 style="font-weight:900;font-size:clamp(30px,4.2vw,48px);margin-bottom:12px">Bet kokiam būreliui. Bet kokiam tėvui. Bet kokiam teikėjui.</h2>
+    <p style="color:var(--muted);font-size:18px">Aštuonkojis keičia spalvą pagal aplinką. Exopus keičia ją pagal tavo būrelį. Paspausk.</p>
+    <div class="pal" id="pal"></div>
+  </div>
+</div></section>
+
+<section id="duk" class="reveal"><div class="wrap">
+  <div class="sec-h"><span class="kicker">DUK</span><h2>Klausimai, kuriuos užduotum ir tu.</h2></div>
+  <div class="faq">
+    <details><summary>Ar Exopus jau veikia?</summary><p>ExoClass sistema veikia šiandien ir tvarko 20 000+ vaikų registracijas, mokėjimus ir bendravimą. Exopus yra DI pagalbininkas ant jos. Pirmas prototipas jau kuria grupes iš vieno sakinio. Šitas puslapis rodo, kur einame.</p></details>
+    <details><summary>Ar jis ką nors išsiųs be manęs?</summary><p>Ne. Viskas, kas susiję su pinigais, tėvais ar sutartimis, laukia tavo patvirtinimo.</p></details>
+    <details><summary>O vaikų duomenys?</summary><p>Exopus mato tik tai, ko reikia užduočiai, ir veikia tavo ExoClass paskyroje.</p></details>
+    <details><summary>Kokiems būreliams tinka?</summary><p>Robotikai, šokiams, sportui, muzikai, kalboms, menui. Jei turi grupes, vaikus ir tėvus, Exopus turi darbo.</p></details>
+    <details><summary>Kiek kainuoja?</summary><p>Parašyk mums, ir pasikalbėsim apie tavo būrelį. Pradedam nuo to, kiek laiko tau sutaupysim.</p></details>
+  </div>
+</div></section>
+
+<div class="close"><div class="wrap">
+  <img class="c-main" src="img/styles/pixar.webp" alt="">
+  <h2>Skaitmeninius darbus aštuonkojui. Tikrą ryšį sau.</h2>
+  <p>Exopus rūpinasi popieriais, kad tu galėtum rūpintis vaikais ir geriausia jų patirtimi būrelyje.</p>
+  <div class="ctas" style="justify-content:center"><a class="btn pri" href="#try">Duok Exopus pirmą užduotį</a><a class="btn ghost" href="https://exoclass.lt" target="_blank" rel="noopener">exoclass.lt</a></div>
+</div></div>
+
+<footer><div class="wrap"><span>ExoClass · Exopus koncepcija · 2026-09</span><span>DI sugeneruoti personažai · ne gyvas produktas · atsiliepimai laukiami</span></div></footer>
+
+<!-- STYLE STUDIO -->
+<button class="studio-fab" id="fab" aria-expanded="false" aria-controls="studio"><img class="c-av" src="img/styles/pixar-av.webp" alt="">🎨 Stilius</button>
+<div class="studio" id="studio" hidden>
+  <h4>Exopus stiliaus studija</h4>
+  <div class="sub">Rinkis personažą, spalvą ir foną. Visas puslapis persijungia. Nusikopijuok nuorodą ir nusiųsk komandai.</div>
+  <label class="t">Personažas</label>
+  <div class="chars" id="chars"></div>
+  <div class="charname" id="charName"></div>
+  <label class="t">Spalva</label>
+  <div class="swatches" id="swatches"></div>
+  <div class="charname" id="colName"></div>
+  <label class="t">Fonas</label>
+  <div class="seg" id="theme"><button data-t="light" class="on">☀️ Šviesus</button><button data-t="dark">🌙 Tamsus</button></div>
+  <div class="row"><button class="btn pri" id="copyLink">🔗 Kopijuoti nuorodą</button><button class="btn ghost" id="shuffle">🎲 Atsitiktinis</button></div>
+  <div class="copied" id="copied"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const root=document.documentElement;
+
+/* characters: key, name, base hue of the artwork */
+const CHARS=[
+ ['pixar','Pixar herojus',285],['plush','Pliušinis',315],['glass','Stiklo smegenys',270],['vinyl','Vinilo žaislas',315],['linas','Lino Exopus',8]];
+/* colours: key, name, target hue (null = artwork original), page accent */
+const COLS=[
+ ['exo','ExoClass (originalas)',null,'#AE4197'],['robotika','Robotika',222,'#3D5BD9'],['sokiai','Šokiai',330,'#D6337A'],
+ ['futbolas','Futbolas',135,'#2E9A55'],['muzika','Muzika',28,'#D9731A'],['sachmatai','Šachmatai',186,'#16899A'],['daile','Dailė',48,'#A87E00'],['violetine','Violetinė',268,'#7A4FD6']];
+let S={s:'pixar',c:'exo',t:'light'};
+
+function apply(){
+  const ch=CHARS.find(x=>x[0]===S.s)||CHARS[0], col=COLS.find(x=>x[0]===S.c)||COLS[0];
+  $$('.c-main').forEach(i=>i.src=`img/styles/${ch[0]}.webp`);
+  $$('.c-av').forEach(i=>i.src=`img/styles/${ch[0]}-av.webp`);
+  const rot=col[2]===null?0:((col[2]-ch[2]+540)%360)-180;
+  root.style.setProperty('--hue',rot+'deg');
+  root.style.setProperty('--p',col[3]);
+  root.dataset.theme=S.t;
+  $$('.c-main,.c-av').forEach(i=>i.style.filter=`hue-rotate(${rot}deg)`+(i.closest('.hero-char,.cv-side,.minibub,.close')?' drop-shadow(0 20px 20px rgba(60,20,70,.25))':''));
+  $$('#chars button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.s));
+  $$('#swatches button').forEach(b=>b.classList.toggle('on',b.dataset.c===S.c));
+  $$('#pal button').forEach(b=>b.classList.toggle('on',b.dataset.c===S.c));
+  $$('#theme button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.t));
+  $('#charName').textContent=ch[1]; $('#colName').textContent=col[1];
+  $('#miniTag').textContent='Exopus · '+col[1].replace(' (originalas)','');
+  const u=new URL(location.href); u.searchParams.set('s',S.s); u.searchParams.set('c',S.c); u.searchParams.set('t',S.t); history.replaceState(null,'',u);
+  try{localStorage.setItem('exopus-style',JSON.stringify(S))}catch(e){}
+}
+(function init(){
+  let saved={};try{saved=JSON.parse(localStorage.getItem('exopus-style')||'{}')}catch(e){}
+  const q=new URLSearchParams(location.search);
+  S={s:q.get('s')||saved.s||'pixar',c:q.get('c')||saved.c||'exo',t:q.get('t')||saved.t||'light'};
+  if(q.get('studio')==='0'){$('#fab').style.display='none'}
+})();
+$('#chars').innerHTML=CHARS.map(c=>`<button data-s="${c[0]}" title="${esc(c[1])}"><img src="img/styles/${c[0]}-av.webp" alt="${esc(c[1])}"></button>`).join('');
+$('#swatches').innerHTML=COLS.map(c=>`<button data-c="${c[0]}" title="${esc(c[1])}" style="background:${c[3]}"></button>`).join('');
+$('#pal').innerHTML=COLS.slice(0,7).map(c=>`<button data-c="${c[0]}"><i style="background:${c[3]}"></i>${esc(c[1].replace(' (originalas)',''))}</button>`).join('');
+$('#chars').onclick=e=>{const b=e.target.closest('button');if(b){S.s=b.dataset.s;apply()}};
+$('#swatches').onclick=e=>{const b=e.target.closest('button');if(b){S.c=b.dataset.c;apply()}};
+$('#pal').onclick=e=>{const b=e.target.closest('button');if(b){S.c=b.dataset.c;apply()}};
+$('#theme').onclick=e=>{const b=e.target.closest('button');if(b){S.t=b.dataset.t;apply()}};
+$('#shuffle').onclick=()=>{S.s=CHARS[Math.floor(Math.random()*CHARS.length)][0];S.c=COLS[Math.floor(Math.random()*COLS.length)][0];apply()};
+$('#copyLink').onclick=async()=>{try{await navigator.clipboard.writeText(location.href);$('#copied').textContent='Nuoroda nukopijuota. Siųsk Linui ir Lukui.'}catch(e){$('#copied').textContent=location.href}};
+$('#fab').onclick=()=>{const st=$('#studio');st.hidden=!st.hidden;$('#fab').setAttribute('aria-expanded',!st.hidden)};
+apply();
+
+/* tasks */
+const TASKS=[
+ ['📋','Administracija','Registracijos, sąrašai, dokumentai.',[['📥','Surenku 14 naujų registracijų iš formos'],['🧹','Sutvarkau 3 dublikatus'],['📂','Suskirstau vaikus pagal amžių ir būrelį']],null,'admin registr dokument'],
+ ['💶','Mokėjimų surinkimas','Kas sumokėjo, kas ne, ir priminimai.',[['🔎','Tikrinu 128 sąskaitas už rugsėjį'],['⚠️','Randu 9 neapmokėtas'],['✍️','Paruošiu mandagų priminimą tėvams']],'Išsiųsti priminimą 9 šeimoms?','mokėj apmok priminim skol'],
+ ['👥','Naujos grupės','Grupė, laikas, vieta ir kaina.',[['📍','Randu adresą: Antakalnio g. 12, Vilnius'],['🗓️','Tikrinu laiką: antradieniais 16:00 laisva'],['🧩','Perimu kainą ir vietas iš 3 panašių grupių']],'Sukurti grupę ir atidaryti registraciją tėvams?','grup nauj sukurk'],
+ ['🏷️','Nuolaidų kodai','Broliams, sesėms ir akcijoms.',[['🧮','Skaičiuoju šeimas su 2+ vaikais'],['🏷️','Sukuriu kodą BROLIAI10'],['🔗','Pririšu jį prie rudens grupių']],'Įjungti BROLIAI10 iki spalio 31?','nuolaid kod akcij'],
+ ['💬','Bendravimas su tėvais','Atsako, primena, informuoja.',[['📨','Perskaitau 6 naujas tėvų žinutes'],['🗂️','4 atsakau pagal taisykles, 2 palieku tau'],['💡','Pažymiu vieną svarbų klausimą']],'Išsiųsti 4 paruoštus atsakymus?','tėv bendrav žinut atsak'],
+ ['✅','Lankomumas','Pažymi, skaičiuoja, pastebi.',[['📲','Surenku lankomumą iš 5 grupių'],['📉','Pastebiu: Ugnė praleido 3 kartus iš eilės'],['🤝','Siūlau švelniai paklausti tėvų']],null,'lankom praleid'],
+ ['📱','SMS žinutės','Visiems ar tik vienai grupei.',[['👥','Pasirenku grupę „Šokiai 5–6 m.“'],['✍️','Parašau: „Rytoj pamoka salėje B“'],['📏','Tikrinu ilgį: 1 SMS']],'Išsiųsti SMS 18 tėvų?','sms'],
+ ['✉️','El. laiškai','Naujienos, priminimai, padėkos.',[['📰','Surenku mėnesio naujienas'],['🖼️','Įdedu 3 nuotraukas be vaikų veidų'],['✉️','Paruošiu laišką visoms šeimoms']],'Išsiųsti laišką 142 šeimoms?','laišk pašt email'],
+ ['🧾','Sąskaitų patikra','Visos sąskaitos, be klaidų.',[['🔎','Sutikrinu 128 sąskaitas su registracijomis'],['❗','Randu 2 su neteisinga kaina'],['🛠️','Paruošiu pataisymus']],'Pataisyti 2 sąskaitas?','sąskait patikr klaid'],
+ ['📏','Grupių dydis','Per pilna? Per tuščia?',[['📊','Skaičiuoju vietas visose grupėse'],['🔴','2 grupės pilnos, 1 turi tik 4 vaikus'],['💡','Siūlau sujungti arba reklamuoti']],null,'dyd viet pilna'],
+ ['📈','Grupių efektyvumas','Kas auga, kas byra, kodėl.',[['📈','Lyginu lankomumą ir išėjimus'],['🔍','Pirmas mėnuo: čia daugiausia nubyrėjimų'],['🧭','Siūlau 1 pokytį pirmai pamokai']],null,'efektyv augim išėj'],
+ ['🖊️','Sutartys','Paruošia ir surenka parašus.',[['📄','Paruošiu 11 sutarčių naujai grupei'],['🔐','Patikrinu tėvų duomenis'],['🖊️','Paruošiu pasirašymą telefonu']],'Išsiųsti 11 sutarčių pasirašyti?','sutart paraš']
+];
+$('#chips').innerHTML=TASKS.map((t,i)=>`<button class="chip" data-t="${i}">${t[0]} ${esc(t[1])}</button>`).join('');
+$('#jobs').innerHTML=TASKS.map((t,i)=>`<div class="job reveal"><div class="e">${t[0]}</div><div><h3>${esc(t[1])}</h3><p>${esc(t[2])}</p><button data-t="${i}">Išbandyk →</button></div></div>`).join('');
+$('#skills').innerHTML=TASKS.map(t=>`<span>${t[0]} ${esc(t[1])}</span>`).join('');
+const tick=['Exopus ką tik: <b>išsiuntė 18 SMS</b>','<b>rado 9 neapmokėtas</b> sąskaitas','<b>sukūrė grupę</b> „Robotika 7–9 m. B“','<b>pažymėjo lankomumą</b> 5 grupėse','<b>atsakė 4 tėvams</b>','<b>paruošė 11 sutarčių</b>','<b>pastebėjo</b>, kad Ugnė praleido 3 kartus','<b>įjungė kodą</b> BROLIAI10'];
+$('#ticker').innerHTML=[...tick,...tick].map(t=>`<span>🐙 ${t}</span>`).join('');
+document.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b&&!b.closest('#theme')){$('#try').scrollIntoView({behavior:'smooth',block:'center'});run(TASKS[+b.dataset.t])}});
+
+/* typing status */
+let typer=null,running=false,t0=0;
+function typeStatus(txt){clearInterval(typer);const el=$('#statusText');let i=0;el.textContent='';typer=setInterval(()=>{el.textContent=txt.slice(0,++i);if(i>=txt.length)clearInterval(typer)},22)}
+const IDLE=['Exopus tikrina 128 sąskaitas…','Exopus pildo grupę „Robotika 7–9 m.“…','Exopus ruošia SMS 18 tėvų…','Exopus laukia tavo užduoties'];let ii=0;
+setInterval(()=>{if(!running)typeStatus(IDLE[ii++%IDLE.length])},4200);typeStatus(IDLE[3]);
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stamp=()=>'0:'+String(Math.floor((performance.now()-t0)/1000)).padStart(2,'0');
+function addLog(ic,txt){const li=document.createElement('li');li.innerHTML=`<time>${stamp()}</time><span>${ic}</span><span>${esc(txt)}</span>`;$('#log').appendChild(li)}
+async function run(task){
+  if(running)return;running=true;$$('.chip').forEach(c=>c.disabled=true);
+  $('#log').innerHTML='';$('#tail').innerHTML='';$('#feedTask').textContent=task[0]+' '+task[1];
+  $('#feed').classList.add('open');$('#world').classList.add('busy');t0=performance.now();
+  for(const [ic,txt] of task[3]){typeStatus('Exopus: '+txt.charAt(0).toLowerCase()+txt.slice(1)+'…');await sleep(1200+Math.random()*500);addLog(ic,txt)}
+  if(task[4]){
+    $('#world').classList.remove('busy');typeStatus('Exopus laukia tavo sprendimo');
+    const box=document.createElement('div');box.className='approve';
+    box.innerHTML=`<p>✋ ${esc(task[4])}<small>Niekas neiškeliauja be tavęs.</small></p><div class="row"><button class="btn pri" data-a="1">Patvirtinti</button><button class="btn ghost" data-a="0">Redaguoti</button></div>`;
+    $('#tail').appendChild(box);
+    const ok=await new Promise(r=>box.querySelectorAll('button').forEach(b=>b.onclick=()=>r(b.dataset.a==='1')));
+    box.remove();
+    if(!ok){addLog('📝','Gerai, paruošiau kitą variantą ir palauksiu tavęs.');return finish(false)}
+    addLog('👍','Tu patvirtinai: '+task[4].replace(/\?$/,''));
+    $('#world').classList.add('busy');typeStatus('Exopus: atlieku…');await sleep(1200);
+    addLog('🚀','Padaryta. Pranešiu, kai bus kas svarbaus.');
+  }
+  finish(true);
+}
+function finish(ok){$('#world').classList.remove('busy');if(ok){const d=document.createElement('div');d.className='done';d.textContent=`✅ Atlikta per ${Math.round((performance.now()-t0)/1000)} s. Tau liko laiko vaikams.`;$('#tail').appendChild(d)}running=false;$$('.chip').forEach(c=>c.disabled=false);typeStatus('Exopus laukia tavo užduoties')}
+$('#askForm').onsubmit=e=>{e.preventDefault();const q=$('#askInput').value.trim();if(!q||running)return;const low=q.toLowerCase();
+  const hit=TASKS.find(t=>t[5].split(' ').some(w=>low.includes(w)));$('#askInput').value='';
+  run(hit?[hit[0],q,hit[2],hit[3],hit[4]]:['🐙',q,'',[['🧠','Supratau: „'+q+'“'],['🔎','Ieškau, kurios grupės ir tėvai susiję'],['🗂️','Susidėlioju planą iš 3 žingsnių']],'Ar pradėti pagal šį planą?'])};
+
+/* bubbles + reveal */
+for(let i=0;i<9;i++){const d=document.createElement('div');d.className='rise';const s=8+Math.random()*16;Object.assign(d.style,{width:s+'px',height:s+'px',left:(10+Math.random()*80)+'%',animationDuration:(7+Math.random()*7)+'s',animationDelay:(-Math.random()*12)+'s'});$('#bubble').appendChild(d)}
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}}),{threshold:.1});
+$$('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
